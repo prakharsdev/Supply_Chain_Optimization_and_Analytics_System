@@ -1,0 +1,26 @@
+version: '3.8'
+
+services:
+  airflow:
+    build: ./airflow
+    environment:
+      - LOAD_EX=y
+      - EXECUTOR=Local
+    volumes:
+      - ./airflow/dags:/usr/local/airflow/dags
+    ports:
+      - "8080:8080"
+
+  dbt:
+    build: ./dbt
+    volumes:
+      - ./dbt:/usr/app
+    command: ["run"]
+
+  terraform:
+    image: hashicorp/terraform:latest
+    volumes:
+      - ./terraform:/workspace
+    working_dir: /workspace
+    entrypoint: ["/bin/sh", "-c"]
+    command: ["terraform init && terraform apply -auto-approve"]
